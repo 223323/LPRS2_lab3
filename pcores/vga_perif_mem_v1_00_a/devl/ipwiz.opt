@@ -1,0 +1,9 @@
+-batch 
+-create vga_perif_mem 
+-ver 1.00.a 
+-dir "C:\materija\ra170-2013\lab3" 
+-lang vhdl 
+-bus axi4lite s 
+-reg 32 
+-xps 
+-driver 
