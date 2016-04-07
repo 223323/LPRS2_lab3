@@ -35,7 +35,7 @@
 -- Filename:          vga_perif_mem.vhd
 -- Version:           1.00.a
 -- Description:       Top level design, instantiates library components and user logic.
--- Date:              Mon Apr 04 17:46:29 2016 (by Create and Import Peripheral Wizard)
+-- Date:              Thu Apr 07 13:13:31 2016 (by Create and Import Peripheral Wizard)
 -- VHDL Standard:     VHDL'93
 ------------------------------------------------------------------------------
 -- Naming Conventions:
@@ -138,7 +138,6 @@ entity vga_perif_mem is
   (
     -- ADD USER PORTS BELOW THIS LINE ------------------
     --USER ports added here
-	 
     -- ADD USER PORTS ABOVE THIS LINE ------------------
 
     -- DO NOT EDIT BELOW THIS LINE ---------------------
@@ -193,7 +192,7 @@ architecture IMP of vga_perif_mem is
       ZERO_ADDR_PAD & USER_SLV_HIGHADDR   -- user logic slave space high address
     );
 
-  constant USER_SLV_NUM_REG               : integer              := 32;
+  constant USER_SLV_NUM_REG               : integer              := 1;
   constant USER_NUM_REG                   : integer              := USER_SLV_NUM_REG;
   constant TOTAL_IPIF_CE                  : integer              := USER_NUM_REG;
 
@@ -252,16 +251,6 @@ begin
     )
     port map
     (
-	--
-		    -- S_AXI_ARREADY                  : out std_logic;
-			-- S_AXI_RDATA                    : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-			-- S_AXI_RRESP                    : out std_logic_vector(1 downto 0);
-			-- S_AXI_RVALID                   : out std_logic;
-			-- S_AXI_WREADY                   : out std_logic;
-			-- S_AXI_BRESP                    : out std_logic_vector(1 downto 0);
-			-- S_AXI_BVALID                   : out std_logic;
-			-- S_AXI_AWREADY                  : out std_logic
-	--
       S_AXI_ACLK                     => S_AXI_ACLK,
       S_AXI_ARESETN                  => S_AXI_ARESETN,
       S_AXI_AWADDR                   => S_AXI_AWADDR,
@@ -317,6 +306,9 @@ begin
 
       Bus2IP_Clk                     => ipif_Bus2IP_Clk,
       Bus2IP_Resetn                  => ipif_Bus2IP_Resetn,
+      Bus2IP_Addr                    => ipif_Bus2IP_Addr,
+      Bus2IP_CS                      => ipif_Bus2IP_CS,
+      Bus2IP_RNW                     => ipif_Bus2IP_RNW,
       Bus2IP_Data                    => ipif_Bus2IP_Data,
       Bus2IP_BE                      => ipif_Bus2IP_BE,
       Bus2IP_RdCE                    => user_Bus2IP_RdCE,

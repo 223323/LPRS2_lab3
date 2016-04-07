@@ -79,7 +79,6 @@ _ngo/
 *.bit
 *.bld
 *.drc
-*.ngc
 *.ngd
 *.ngr
 *.pad

@@ -13,12 +13,11 @@ Peripheral Summary:
   version                                    : 1.00.a
   type                                       : AXI4LITE slave
   features                                   : slave attachment
-                                               user s/w registers
 
 Address Block for User Logic and IPIF Predefined Services
 
-  user logic slave space                     : C_BASEADDR + 0x00000000
-                                             : C_BASEADDR + 0x000000FF
+  user logic slave space                     : C_BASEADDR
+                                             : C_BASEADDR
 
 
 ================================================================================
@@ -53,6 +52,30 @@ Address Block for User Logic and IPIF Predefined Services
 
     This Peripheral Analysis Order file defines the analysis order of all the HDL
     source files that are used to compile your peripheral.
+
+- ISE project file(s)
+
+  devl/projnav/vga_perif_mem.xise
+
+    This is the ProjNavigator project file. It sets up the needed logical
+    libraries and dependent library files for you to help you develop your
+    peripheral using ProjNavigator.
+
+  devl/projnav/vga_perif_mem.tcl
+
+    This is the TCL command line file used to generate the .xise file.
+
+- XST synthesis file(s)
+
+  devl/synthesis/vga_perif_mem_xst.scr
+
+    This is the XST synthesis script file to compile your peripheral.
+    Note: you may want to modify the device part option for your target.
+
+  devl/synthesis/vga_perif_mem_xst.prj
+
+    This is the XST synthesis project file used by the above script file to
+    compile your peripheral.
 
 - Driver source file(s)
 

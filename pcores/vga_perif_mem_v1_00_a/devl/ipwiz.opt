@@ -4,6 +4,6 @@
 -dir "C:\materija\ra170-2013\lab3" 
 -lang vhdl 
 -bus axi4lite s 
--reg 32 
 -xps 
+-ise 
 -driver 

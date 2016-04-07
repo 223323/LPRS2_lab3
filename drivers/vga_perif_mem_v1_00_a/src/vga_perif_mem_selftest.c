@@ -2,7 +2,7 @@
 * Filename:          C:\materija\ra170-2013\lab3/drivers/vga_perif_mem_v1_00_a/src/vga_perif_mem_selftest.c
 * Version:           1.00.a
 * Description:       Contains a diagnostic self-test function for the vga_perif_mem driver
-* Date:              Mon Apr 04 17:46:30 2016 (by Create and Import Peripheral Wizard)
+* Date:              Thu Apr 07 13:13:36 2016 (by Create and Import Peripheral Wizard)
 *****************************************************************************/
 
 
@@ -61,29 +61,6 @@ XStatus VGA_PERIF_MEM_SelfTest(void * baseaddr_p)
   xil_printf("******************************\n\r");
   xil_printf("* User Peripheral Self Test\n\r");
   xil_printf("******************************\n\n\r");
-
-  /*
-   * Write to user logic slave module register(s) and read back
-   */
-  xil_printf("User logic slave module test...\n\r");
-
-  for (write_loop_index = 0 ; write_loop_index < VGA_PERIF_MEM_USER_NUM_REG; write_loop_index++)
-    VGA_PERIF_MEM_mWriteSlaveReg0 (baseaddr, write_loop_index*4, (write_loop_index+1)*READ_WRITE_MUL_FACTOR);
-  for (read_loop_index = 0 ; read_loop_index < VGA_PERIF_MEM_USER_NUM_REG; read_loop_index++)
-    if ( VGA_PERIF_MEM_mReadSlaveReg0 (baseaddr, read_loop_index*4) != (read_loop_index+1)*READ_WRITE_MUL_FACTOR){
-      xil_printf ("Error reading register value at address %x", (int)baseaddr + read_loop_index*4);
-      return XST_FAILURE;
-    }
-
-  xil_printf("   - slave register write/read passed\n\n\r");
-
-  /* Read the registers at the base address to ensure that this is indeed working */
-  if ( (VGA_PERIF_MEM_mReadSlaveReg0 (baseaddr, 0)) != 0x0){
-    xil_printf("   - soft reset failed\n\n\r");
-    return XST_FAILURE;
-  }
-
-  xil_printf("   - soft reset passed\n\n\r");
 
   return XST_SUCCESS;
 }
