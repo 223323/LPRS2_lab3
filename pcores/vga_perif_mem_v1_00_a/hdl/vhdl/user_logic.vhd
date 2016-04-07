@@ -101,6 +101,18 @@ entity user_logic is
   (
     -- ADD USER PORTS BELOW THIS LINE ------------------
     --USER ports added here
+	 clk_i          : in  std_logic;
+    reset_n_i      : in  std_logic;
+    -- vga
+    vga_hsync_o    : out std_logic;
+    vga_vsync_o    : out std_logic;
+    blank_o        : out std_logic;
+    pix_clock_o    : out std_logic;
+    psave_o        : out std_logic;
+    sync_o         : out std_logic;
+    red_o          : out std_logic_vector(7 downto 0);
+    green_o        : out std_logic_vector(7 downto 0);
+    blue_o         : out std_logic_vector(7 downto 0);
     -- ADD USER PORTS ABOVE THIS LINE ------------------
 
     -- DO NOT EDIT BELOW THIS LINE ---------------------
@@ -137,9 +149,8 @@ architecture IMP of user_logic is
 
   --USER signal declarations added here, as needed for user logic
   
-   constant RES_NUM : natural := 6;
+  constant RES_NUM : natural := 6;
   
-
   type t_param_array is array (0 to RES_NUM-1) of natural;
   
   constant RES_TYPE             : natural := 1;
@@ -207,6 +218,24 @@ architecture IMP of user_logic is
   );
 	end component vga_top;
 	
+  component ODDR2
+  generic(
+   DDR_ALIGNMENT : string := "NONE";
+   INIT          : bit    := '0';
+   SRTYPE        : string := "SYNC"
+   );
+  port(
+    Q           : out std_ulogic;
+    C0          : in  std_ulogic;
+    C1          : in  std_ulogic;
+    CE          : in  std_ulogic := 'H';
+    D0          : in  std_ulogic;
+    D1          : in  std_ulogic;
+    R           : in  std_ulogic := 'L';
+    S           : in  std_ulogic := 'L'
+  );
+  end component;
+	
   constant update_period     : std_logic_vector(31 downto 0) := conv_std_logic_vector(1, 32);
   
   constant GRAPH_MEM_ADDR_WIDTH : natural := MEM_ADDR_WIDTH + 6;-- graphics addres is scales with minumum char size 8*8 log2(64) = 6
@@ -241,6 +270,8 @@ architecture IMP of user_logic is
   signal dir_blue            : std_logic_vector(7 downto 0);
   signal dir_pixel_column    : std_logic_vector(10 downto 0);
   signal dir_pixel_row       : std_logic_vector(10 downto 0);
+  
+  
 
 begin
 
@@ -312,11 +343,31 @@ begin
     green_o            => green_o,
     blue_o             => blue_o     
   );
+  
+  clk5m_inst : ODDR2
+  generic map(
+    DDR_ALIGNMENT => "NONE",  -- Sets output alignment to "NONE","C0", "C1" 
+    INIT => '0',              -- Sets initial state of the Q output to '0' or '1'
+    SRTYPE => "SYNC"          -- Specifies "SYNC" or "ASYNC" set/reset
+  )
+  port map (
+    Q  => pix_clock_o,       -- 1-bit output data
+    C0 => pix_clock_s,       -- 1-bit clock input
+    C1 => pix_clock_n,       -- 1-bit clock input
+    CE => '1',               -- 1-bit clock enable input
+    D0 => '1',               -- 1-bit data input (associated with C0)
+    D1 => '0',               -- 1-bit data input (associated with C1)
+    R  => '0',               -- 1-bit reset input
+    S  => '0'                -- 1-bit set input
+  );
+  pix_clock_n <= not(pix_clock_s);
 
   ------------------------------------------
   -- Example code to drive IP to Bus signals
   ------------------------------------------
   IP2Bus_Data  <= (others => '0');
+  
+  
 
   IP2Bus_WrAck <= '0';
   IP2Bus_RdAck <= '0';
