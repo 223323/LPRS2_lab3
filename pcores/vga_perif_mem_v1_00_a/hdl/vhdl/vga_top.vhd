@@ -27,6 +27,8 @@ entity vga_top is
     );
   port (
     clk_i               : in  std_logic;
+	 -- novi clock
+	 microblaze_clk		: in std_logic;
     reset_n_i           : in  std_logic;
     --
     direct_mode_i       : in  std_logic; -- 0 - text and graphics interface mode, 1 - direct mode (direct force RGB component)
@@ -139,6 +141,9 @@ architecture rtl of vga_top is
   port(
     clk_i     : in  std_logic;
     reset_n_i : in  std_logic;
+	 -- novi clock
+	 wr_clk_i : in std_logic;
+	 rd_clk_i : in std_logic;
     --          
     wr_addr_i : in  std_logic_vector(MEM_ADDR_WIDTH-1 downto 0);
     rd_addr_i : in  std_logic_vector(MEM_ADDR_WIDTH-1 downto 0);
@@ -257,7 +262,10 @@ begin
   port map(
     clk_i     => pix_clk_s,
     reset_n_i => vga_rst_n_s,
-    --
+    -- novi clock
+	 wr_clk_i => microblaze_clk,
+	 rd_clk_i => pix_clk_s,
+	 --
     wr_addr_i => graph_addr_i,
     wr_data_i => graph_data_i,
     we_i      => graph_we_i,

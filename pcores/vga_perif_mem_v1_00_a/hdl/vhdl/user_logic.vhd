@@ -180,6 +180,7 @@ architecture IMP of user_logic is
     );
   port (
     clk_i               : in  std_logic;
+	 microblaze_clk		: in std_logic;
     reset_n_i           : in  std_logic;
     --
     direct_mode_i       : in  std_logic; -- 0 - text and graphics interface mode, 1 - direct mode (direct force RGB component)
@@ -271,8 +272,11 @@ architecture IMP of user_logic is
   signal dir_pixel_column    : std_logic_vector(10 downto 0);
   signal dir_pixel_row       : std_logic_vector(10 downto 0);
   
+  signal unit_id : std_logic_vector(1 downto 0);
+  signal unit_address : std_logic_vector(21 downto 0);
   
-
+  signal microblaze_clk : std_logic;
+  
 begin
 
   --USER logic implementation added here
@@ -285,14 +289,16 @@ begin
   graphics_lenght <= conv_std_logic_vector(MEM_SIZE*8*8, GRAPH_MEM_ADDR_WIDTH);
   
   -- removed to inputs pin
-  direct_mode <= '1';
-  display_mode     <= "10";  -- 01 - text mode, 10 - graphics mode, 11 - text & graphics
+--  direct_mode <= '1';
+--  display_mode     <= "10";  -- 01 - text mode, 10 - graphics mode, 11 - text & graphics
+--  
+--  font_size        <= x"1";
+--  show_frame       <= '1';
+--  foreground_color <= x"FFFFFF";
+--  background_color <= x"000000";
+--  frame_color      <= x"FF0000";
   
-  font_size        <= x"1";
-  show_frame       <= '1';
-  foreground_color <= x"FFFFFF";
-  background_color <= x"000000";
-  frame_color      <= x"FF0000";
+  
 	
   vga_top_i: vga_top
   generic map(
@@ -307,6 +313,7 @@ begin
   )
   port map(
     clk_i              => clk_i,
+	 microblaze_clk => microblaze_clk,
     reset_n_i          => reset_n_i,
     --
     direct_mode_i      => direct_mode,
@@ -365,10 +372,63 @@ begin
   ------------------------------------------
   -- Example code to drive IP to Bus signals
   ------------------------------------------
-  IP2Bus_Data  <= (others => '0');
   
+  unit_id <=  Bus2IP_Addr(24 to 25);
+  unit_address <= Bus2IP_Addr(2 to 23);
   
+  REGISTERS_P: process (Bus2IP_Clk) begin
+		if (rising_edge(Bus2IP_Clk) and unit_id = "00") then
+			if (Bus2IP_RNW = '1') then
+				if (unit_address = 0) then
+					IP2Bus_Data(0) <= direct_mode;
+				elsif (unit_address = 4) then
+					IP2Bus_Data(1 downto 0) <= display_mode;
+				elsif (unit_address = 8) then
+					IP2Bus_Data(0) <=  show_frame ;
+				elsif (unit_address = 12) then
+					  IP2Bus_Data(3 downto 0)<= font_size;
+				elsif (unit_address = 16) then
+					 IP2Bus_Data(23 downto 0) <= foreground_color(23 downto 0);
+				elsif (unit_address = 20) then
+					 IP2Bus_Data(23 downto 0) <= background_color(23 downto 0);
+				elsif (unit_address = 24) then
+					IP2Bus_Data(23 downto 0) <= frame_color(23 downto 0) ;
+				end if;
+			else
+				if (unit_address = 0) then
+					direct_mode <= Bus2IP_Data(0);
+				elsif (unit_address = 4) then
+					display_mode <= Bus2IP_Data(1 downto 0);
+				elsif (unit_address = 8) then
+					show_frame <= Bus2IP_Data(0);
+				elsif (unit_address = 12) then
+					font_size <= Bus2IP_Data(3 downto 0);
+				elsif (unit_address = 16) then
+					foreground_color(23 downto 0) <= Bus2IP_Data(23 downto 0);
+				elsif (unit_address = 20) then
+					background_color(23 downto 0) <= Bus2IP_Data(23 downto 0);
+				elsif (unit_address = 24) then
+					frame_color(23 downto 0) <= Bus2IP_Data(23 downto 0);
+				end if;
+			end if;
+		end if;
+  end process;
+  
+  dir_red <= x"00";
+  dir_green <= x"00";
+  dir_blue <= x"00";
 
+  char_we <= '1' when unit_id = "01" else '0';
+  pixel_we <= '1' when unit_id = "10" else '0';
+  
+  char_address <= unit_address(MEM_ADDR_WIDTH-1 downto 0);
+  pixel_address <= unit_address(GRAPH_MEM_ADDR_WIDTH-1 downto 0);
+  
+  char_value <= Bus2IP_Data(5 downto 0);
+  pixel_value <= Bus2IP_Data(GRAPH_MEM_DATA_WIDTH-1 downto 0);
+  
+  microblaze_clk <= Bus2IP_Clk;
+  
   IP2Bus_WrAck <= '0';
   IP2Bus_RdAck <= '0';
   IP2Bus_Error <= '0';
