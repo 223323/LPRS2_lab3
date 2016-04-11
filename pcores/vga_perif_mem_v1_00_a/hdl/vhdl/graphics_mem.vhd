@@ -71,6 +71,8 @@ begin
                       rd_addr_i(5-1 downto 0);
   
   
+  -----------------------------------------
+  
   -- DP_GRAPHICS_MEM : process (clk_i) begin
     -- if (rising_edge(clk_i)) then
       -- if (we_i = '1') then

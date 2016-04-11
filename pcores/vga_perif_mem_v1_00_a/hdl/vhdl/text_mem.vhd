@@ -22,6 +22,7 @@ entity text_mem is
     );
   port(
     clk_i     : in  std_logic;
+	wr_clk_i : in std_logic;
     reset_n_i : in  std_logic;             
     wr_addr_i : in  std_logic_vector(MEM_ADDR_WIDTH-1 downto 0);     -- Slave address input
     rd_addr_i : in  std_logic_vector(MEM_ADDR_WIDTH-1 downto 0);     -- Slave address input
@@ -46,12 +47,15 @@ architecture arc_text_mem of text_mem is
           );
   
 begin
+
+  DP_TEXT_MEM_WR : process (wr_clk_i) begin
+	if (rising_edge(wr_clk_i) and we_i = '1') then
+		text_mem(conv_integer(wr_addr_i)) <= wr_data_i; -- update img_mem from out_mem
+	end if;
+  end process;
   
   DP_TEXT_MEM : process (clk_i) begin
     if (rising_edge(clk_i)) then
-      if (we_i = '1') then
-        text_mem(conv_integer(wr_addr_i)) <= wr_data_i; -- update img_mem from out_mem
-      end if;
       rd_data_o <= text_mem(conv_integer(index));
     end if;
   end process;

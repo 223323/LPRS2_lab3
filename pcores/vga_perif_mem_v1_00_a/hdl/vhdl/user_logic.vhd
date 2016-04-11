@@ -180,7 +180,7 @@ architecture IMP of user_logic is
     );
   port (
     clk_i               : in  std_logic;
-	 microblaze_clk		: in std_logic;
+	microblaze_clk		: in std_logic;
     reset_n_i           : in  std_logic;
     --
     direct_mode_i       : in  std_logic; -- 0 - text and graphics interface mode, 1 - direct mode (direct force RGB component)
@@ -313,7 +313,7 @@ begin
   )
   port map(
     clk_i              => clk_i,
-	 microblaze_clk => microblaze_clk,
+	microblaze_clk 	   => microblaze_clk,
     reset_n_i          => reset_n_i,
     --
     direct_mode_i      => direct_mode,
@@ -384,7 +384,7 @@ begin
 				elsif (unit_address = 4) then
 					IP2Bus_Data(1 downto 0) <= display_mode;
 				elsif (unit_address = 8) then
-					IP2Bus_Data(0) <=  show_frame ;
+					IP2Bus_Data(0) <=  show_frame;
 				elsif (unit_address = 12) then
 					  IP2Bus_Data(3 downto 0)<= font_size;
 				elsif (unit_address = 16) then
